@@ -1,4 +1,10 @@
 venv/
 pycache/
-*.pyc
+.pyc
 .DS_Store
+.env
+.ipynb_checkpoints/
+
+results/.pkl
+!results/resume_classifier.pkl
+!results/tfidf_vectorizer.pkl
