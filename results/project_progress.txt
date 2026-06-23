@@ -1,0 +1,13 @@
+Resume Classification Accuracy:
+65.39%
+
+Skill Match Example:
+.NET Developer
+Match: 6.67%
+
+Top Job Recommendations:
+1. UI Designer - 50%
+2. System Engineer - 40%
+3. Senior System Engineer - 40%
+4. System Engineer - Monitoring - 40%
+5. System Engineer - 40%

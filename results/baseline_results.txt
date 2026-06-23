@@ -1,0 +1,5 @@
+Model: Logistic Regression
+Features: TF-IDF (max_features=5000)
+Dataset: Resume.csv
+Categories: 24
+Accuracy: 63.38%

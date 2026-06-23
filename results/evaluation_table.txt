@@ -1,0 +1,28 @@
+AI CAREER ADVISOR - EVALUATION RESULTS
+
+Resume Category | Top Recommendation | Match Score | Assessment
+
+INFORMATION-TECHNOLOGY | UI Designer | 50.00% | Partial success. The recommendation was based on matching skills such as HTML, Photoshop, and Illustrator. System Engineer roles were also highly ranked.
+
+HR | UI Designer | 60.00% | Incorrect recommendation. The system prioritized design-related skills present in the resume and failed to identify HR-specific roles.
+
+DESIGNER | Cloud Infrastructure Security Architect | 25.00% | Poor match. The dataset contained limited design-oriented positions, resulting in weak recommendations.
+
+FINANCE | Market Research Analyst | 50.00% | Reasonable recommendation. Shared skills included Excel, Communication, Critical Thinking, and Attention to Detail.
+
+BUSINESS-DEVELOPMENT | Principal Security Analyst | 33.33% | Poor match. Recommendation was influenced by overlapping skills such as Leadership and Compliance rather than domain relevance.
+
+HEALTHCARE | Lead Cybersecurity Analyst | 33.33% | Poor match. Recommendation was driven by Risk Management and Compliance skills due to the lack of healthcare jobs in the dataset.
+
+Overall Classification Accuracy:
+65.39%
+
+Key Findings:
+- The resume classification model achieved an accuracy of 65.39%.
+- The recommendation system performed best for technology-related resumes.
+- Skill-based matching successfully identified overlapping skills between resumes and job descriptions.
+- Recommendation quality decreased for categories that were underrepresented in the job dataset.
+- The mismatch between the resume dataset (24 categories) and the job dataset (primarily technical roles) was the main limitation affecting recommendation quality.
+
+Conclusion:
+The system successfully classified resumes, identified matching and missing skills, and generated job recommendations. Results were strongest for technical resumes and demonstrated the importance of dataset alignment when developing AI-powered recommendation systems.
