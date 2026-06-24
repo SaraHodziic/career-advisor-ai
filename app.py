@@ -11,6 +11,12 @@ st.set_page_config(
     layout="wide"
 )
 
+with open("styles.css") as f:
+    st.markdown(
+        f"<style>{f.read()}</style>",
+        unsafe_allow_html=True
+    )
+
 # Load model and vectorizer
 model = joblib.load("results/resume_classifier.pkl")
 vectorizer = joblib.load("results/tfidf_vectorizer.pkl")
@@ -20,11 +26,12 @@ resume_df = pd.read_csv("data/Resume/Resume.csv")
 job_df = pd.read_csv("data/job_dataset.csv")
 
 # Header
-st.title("🎯 AI Career Advisor")
+st.title("AI Career Advisor")
 
 st.markdown("""
-AI-powered resume analysis system that classifies resumes,
-recommends suitable jobs, and identifies relevant skills.
+A machine learning system for resume classification,
+job recommendation, skill gap analysis, and
+job description matching.
 """)
 
 st.info(
@@ -88,21 +95,18 @@ if page == "About Project":
     )
     st.stop()
 
-# Upload Resume
-uploaded_file = st.file_uploader(
-    "📄 Upload Resume (PDF or TXT)",
+# Sidebar
+st.sidebar.header("Resume Input")
+
+uploaded_file = st.sidebar.file_uploader(
+    "Upload Resume (PDF or TXT)",
     type=["pdf", "txt"]
 )
 
-# Job Description
-job_description = st.text_area(
-    "📋 Paste Job Description",
-    height=200,
-    help="Paste a job advertisement to compare it with the resume"
+job_description = st.sidebar.text_area(
+    "Paste Job Description",
+    height=150
 )
-
-# Sidebar
-st.sidebar.header("Resume Input")
 
 if uploaded_file is None:
 
@@ -345,10 +349,10 @@ if analyze:
     else:
 
         recommendation_level = "Weak"
-    
 
-    # Metrics
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
+                    # Metrics
+
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         st.metric(
@@ -364,22 +368,22 @@ if analyze:
 
     with col3:
         st.metric(
-            "Best Match Score",
-            f"{best_match['score']:.2f}%"
-        )
-
-    with col4: 
-        st.metric(
             "Prediction Confidence",
             f"{confidence:.2f}%"
         )
 
+    col4, col5, col6 = st.columns(3)
+
+    with col4:
+        st.metric(
+            "Best Match Score",
+            f"{best_match['score']:.2f}%"
+        )
+
     with col5:
-
         if job_match_score is not None:
-
             st.metric(
-                "JD Match",
+                "JD Match Score",
                 f"{job_match_score:.2f}%"
             )
 
@@ -389,14 +393,36 @@ if analyze:
             recommendation_level
         )
 
-    st.subheader("📊 Resume Strength")
+    left, right = st.columns(2)
 
-    st.progress(strength_score / 100)
+    with left:
 
-    st.caption(
-        f"Resume Strength Score: {strength_score}/100"
-    )
+        st.subheader("Resume Strength")
 
+        st.progress(
+            strength_score / 100
+        )
+
+        st.caption(
+            f"Resume Strength Score: {strength_score}/100"
+        )
+
+    with right:
+
+        if job_match_score is not None:
+
+            st.subheader(
+                "Job Description Match"
+            )
+
+            st.progress(
+                job_match_score / 100
+            )
+
+            st.caption(
+                f"Similarity Score: {job_match_score:.2f}%"
+            )
+            
     # Recommendation Quality
     if best_match["score"] >= 50:
         st.success(
@@ -415,7 +441,7 @@ if analyze:
 
     # Chart
     st.subheader(
-        "🏆 Top 5 Job Recommendations"
+        "Top 5 Job Recommendations"
     )
 
     chart_data = pd.DataFrame({
@@ -442,7 +468,7 @@ if analyze:
             )
 
             st.write(
-                "### ✅ Matching Skills"
+                "### Matching Skills"
             )
 
             if result["matching_skills"]:
@@ -485,7 +511,7 @@ if analyze:
 
     # Suggested Skills
     st.subheader(
-        "🎓 Suggested Skills To Learn"
+        "Suggested Skills To Learn"
     )
 
     if best_match["missing_skills"]:
@@ -507,7 +533,7 @@ if analyze:
     st.divider()
 
     st.subheader(
-        "🚀 Career Path Suggestions"
+        "Career Path Suggestions"
     )
 
     if predicted_category in career_paths:
@@ -556,7 +582,7 @@ Suggested Skills:
 
     # Resume Preview
     st.subheader(
-        "📄 Resume Preview"
+        "Resume Preview"
     )
 
     st.text_area(

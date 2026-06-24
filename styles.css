@@ -1,0 +1,111 @@
+/* Main page */
+
+.main {
+    background-color: #f5f7fa;
+}
+
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    max-width: 1400px;
+}
+
+/* Titles */
+
+h1 {
+    text-align: center;
+    color: #1f2937;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+h2, h3 {
+    color: #374151;
+}
+
+/* Metric cards */
+
+div[data-testid="metric-container"] {
+    background: white;
+    border: none;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow:
+        0 2px 6px rgba(0,0,0,0.05),
+        0 8px 24px rgba(0,0,0,0.04);
+}
+
+/* Sidebar */
+
+[data-testid="stSidebar"] {
+    background-color: #ffffff;
+    border-right: 1px solid #e5e7eb;
+}
+
+/* Buttons */
+
+.stButton button {
+    width: 100%;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 12px;
+    border: none;
+    height: 48px;
+    font-weight: 600;
+}
+
+.stButton button:hover {
+    background-color: #1d4ed8;
+}
+
+/* File uploader */
+
+[data-testid="stFileUploader"] {
+    background: white;
+    border-radius: 16px;
+    padding: 15px;
+    box-shadow:
+        0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Text areas */
+
+textarea {
+    border-radius: 12px !important;
+}
+
+/* Expander cards */
+
+.streamlit-expanderHeader {
+    font-weight: 600;
+}
+
+details {
+    background: white;
+    border-radius: 12px;
+    padding: 8px;
+    margin-bottom: 10px;
+    box-shadow:
+        0 2px 6px rgba(0,0,0,0.04);
+}
+
+/* Dataframe */
+
+[data-testid="stDataFrame"] {
+    background: white;
+    border-radius: 12px;
+}
+
+/* Progress bars */
+
+.stProgress > div > div {
+    border-radius: 999px;
+}
+
+/* Success / warning messages */
+
+.stSuccess,
+.stWarning,
+.stError {
+    border-radius: 12px;
+}
