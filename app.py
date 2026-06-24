@@ -267,7 +267,7 @@ if analyze:
 
     if job_match_score is not None:
 
-        st.subheader("📌 Job Description Match"
+        st.subheader("Job Description Match"
         )
 
         st.progress(job_match_score / 100
@@ -345,25 +345,40 @@ if analyze:
     elif best_match["score"] >= 30:
 
         recommendation_level = "Moderate"
-
     else:
 
         recommendation_level = "Weak"
 
-                    # Metrics
+    category_names = {
+        "INFORMATION-TECHNOLOGY": "IT",
+        "BUSINESS-DEVELOPMENT": "Business Dev",
+        "PUBLIC-RELATIONS": "PR"
+    }
+
+    display_actual = category_names.get(
+        actual_category,
+        actual_category
+    )
+
+    display_predicted = category_names.get(
+        predicted_category,
+        predicted_category
+    )
+
+    # Metrics
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
         st.metric(
             "Actual Category",
-            actual_category
+            display_actual
         )
 
     with col2:
         st.metric(
             "Predicted Category",
-            predicted_category
+            display_actual
         )
 
     with col3:
@@ -385,6 +400,11 @@ if analyze:
             st.metric(
                 "JD Match Score",
                 f"{job_match_score:.2f}%"
+            )
+        else:
+            st.metric(
+                "JD Match Score",
+                "N/A"
             )
 
     with col6:
@@ -422,7 +442,7 @@ if analyze:
             st.caption(
                 f"Similarity Score: {job_match_score:.2f}%"
             )
-            
+
     # Recommendation Quality
     if best_match["score"] >= 50:
         st.success(
