@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 from pypdf import PdfReader
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Page config
 st.set_page_config(
@@ -73,6 +74,13 @@ uploaded_file = st.file_uploader(
     type=["pdf", "txt"]
 )
 
+# Job Description
+job_description = st.text_area(
+    "📋 Paste Job Description",
+    height=200,
+    help="Paste a job advertisement to compare it with the resume"
+)
+
 # Sidebar
 st.sidebar.header("Resume Input")
 
@@ -132,6 +140,49 @@ if analyze:
         resume_vector
     )[0]
 
+    career_paths = {
+
+    "INFORMATION-TECHNOLOGY": [
+        "Junior Developer",
+        "Software Engineer",
+        "Senior Software Engineer",
+        "Tech Lead",
+        "Engineering Manager"
+    ],
+
+    "FINANCE": [
+        "Financial Analyst",
+        "Senior Analyst",
+        "Finance Manager",
+        "Finance Director",
+        "CFO"
+    ],
+
+    "DESIGNER": [
+        "Junior Designer",
+        "UI/UX Designer",
+        "Senior Designer",
+        "Product Designer",
+        "Design Manager"
+    ],
+
+    "BUSINESS-DEVELOPMENT": [
+        "Business Analyst",
+        "Business Development Manager",
+        "Senior Manager",
+        "Director",
+        "VP Business Development"
+    ],
+
+    "HEALTHCARE": [
+        "Healthcare Assistant",
+        "Healthcare Specialist",
+        "Senior Specialist",
+        "Department Manager",
+        "Healthcare Director"
+    ]
+}  
+
     confidence = max(
         model.predict_proba(
             resume_vector
@@ -140,6 +191,37 @@ if analyze:
 
     resume_lower = resume_text.lower()
 
+    # Resume ↔ Job Description Match
+
+    job_match_score = None
+
+    matching_keywords = []
+
+    missing_keywords = []
+
+    job_match_score = None
+
+    matching_keywords = []
+
+    missing_keywords = []
+
+    if job_description:
+
+        texts = [
+            resume_text,
+            job_description
+        ]
+
+        tfidf = vectorizer.transform(
+            texts
+        )
+
+        similarity = cosine_similarity(
+            tfidf[0:1],
+            tfidf[1:2]
+        )[0][0]
+
+        job_match_score = similarity * 100
     # Resume Strength Score
     strength_score = 0
 
@@ -158,6 +240,19 @@ if analyze:
     if "project" in resume_lower:
         strength_score += 20
     results = []
+
+    if job_match_score is not None:
+
+        st.subheader("📌 Job Description Match"
+        )
+
+        st.progress(job_match_score / 100
+        )
+
+        st.write(
+            f"Similarity Score: {job_match_score:.2f}%"
+        )
+
 
     # Job Matching
     for _, job in job_df.iterrows():
@@ -237,11 +332,20 @@ if analyze:
             f"{best_match['score']:.2f}%"
         )
 
-    with col4:
+    with col4: 
         st.metric(
             "Prediction Confidence",
             f"{confidence:.2f}%"
         )
+
+    with col5:
+
+        if job_match_score is not None:
+
+            st.metric(
+                "JD Match",
+                f"{job_match_score:.2f}%"
+            )
 
     st.subheader("📊 Resume Strength")
 
@@ -359,6 +463,26 @@ if analyze:
         )
 
     st.divider()
+
+    st.subheader(
+        "🚀 Career Path Suggestions"
+    )
+
+    if predicted_category in career_paths:
+
+        for step in career_paths[
+            predicted_category
+        ]:
+
+            st.write(
+                f"➡️ {step}"
+            )
+
+    else:
+
+        st.write(
+            "Career path information not available for this category."
+        )
 
     # Download Report
     report = f"""
