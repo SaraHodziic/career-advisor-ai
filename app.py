@@ -65,7 +65,27 @@ if page == "About Project":
     based on resume content and should not replace
     human judgment or professional career advice.
     """)
+    st.subheader("Model Evaluation")
 
+    st.write("""
+    Accuracy: 65.39%
+
+    Precision: 68.56%
+
+    Recall: 65.39%
+
+    F1 Score: 64.97%
+
+    Logistic Regression Accuracy: 65.39%
+
+    MLP Accuracy: 62.78%
+    """)
+
+    st.subheader("Confusion Matrix")
+
+    st.image(
+        "results/confusion_matrix.png"
+    )
     st.stop()
 
 # Upload Resume
@@ -309,10 +329,26 @@ if analyze:
     )
 
     best_match = results[0]
+
+    if best_match["score"] >= 70:
+
+        recommendation_level = "Excellent"
+
+    elif best_match["score"] >= 50:
+
+        recommendation_level = "Good"
+
+    elif best_match["score"] >= 30:
+
+        recommendation_level = "Moderate"
+
+    else:
+
+        recommendation_level = "Weak"
     
 
     # Metrics
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
 
     with col1:
         st.metric(
@@ -346,6 +382,12 @@ if analyze:
                 "JD Match",
                 f"{job_match_score:.2f}%"
             )
+
+    with col6:
+        st.metric(
+            "Recommendation Level",
+            recommendation_level
+        )
 
     st.subheader("📊 Resume Strength")
 
