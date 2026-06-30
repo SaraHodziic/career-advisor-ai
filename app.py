@@ -8,7 +8,7 @@ from src.recommender import recommend_jobs
 from src.jd_matcher import calculate_job_match
 from src.career_paths import career_paths
 from src.report_generator import generate_report
-
+from src.pdf_report import create_pdf
 
 # --------------------------------------------------
 # Page Configuration
@@ -88,7 +88,6 @@ page = st.sidebar.radio(
 
 )
 
-
 # --------------------------------------------------
 # About Page
 # --------------------------------------------------
@@ -98,16 +97,12 @@ if page == "About Project":
     st.title("About Project")
 
     st.subheader("Authors")
-
     st.write("Sara Hodzic")
-
     st.write("Mithat Misirlic")
-
 
     st.subheader("Technologies")
 
     st.write("""
-
 - Python
 - Pandas
 - Scikit-Learn
@@ -115,48 +110,58 @@ if page == "About Project":
 - TF-IDF
 - Logistic Regression
 - MLP Classifier
-
 """)
 
+    st.subheader("Project Statistics")
 
-    st.subheader("Datasets")
+    col1, col2, col3, col4 = st.columns(4)
 
-    st.write("""
+    with col1:
+        st.metric("Resumes", "2,484")
 
-Resume Dataset
+    with col2:
+        st.metric("Job Descriptions", "1,068")
 
-- 2484 resumes
-- 24 categories
+    with col3:
+        st.metric("Job Categories", "24")
 
-Job Dataset
-
-- 1068 job descriptions
-
-""")
-
+    with col4:
+        st.metric("ML Models", "2")
 
     st.subheader("Model Evaluation")
 
-    st.write("""
+    col1, col2 = st.columns(2)
 
-Accuracy : 65.39%
+    with col1:
+        st.metric("Accuracy", "65.39%")
+        st.metric("Precision", "68.56%")
 
-Precision : 68.56%
+    with col2:
+        st.metric("Recall", "65.39%")
+        st.metric("F1 Score", "64.97%")
 
-Recall : 65.39%
+    st.subheader("Model Comparison")
 
-F1 Score : 64.97%
+    comparison = pd.DataFrame({
+        "Model": [
+            "Logistic Regression",
+            "MLP Classifier"
+        ],
+        "Accuracy": [
+            65.39,
+            62.78
+        ]
+    })
 
-Logistic Regression : 65.39%
-
-MLP : 62.78%
-
-""")
-
-
-    st.image(
-        "results/confusion_matrix.png"
+    st.dataframe(
+        comparison,
+        hide_index=True,
+        use_container_width=True
     )
+
+    st.subheader("Confusion Matrix")
+
+    st.image("results/confusion_matrix.png")
 
     st.stop()
 
@@ -215,9 +220,9 @@ analyze = st.sidebar.button(
 # --------------------------------------------------
 
 if analyze:
-
+    with st.spinner("Analyzing Resume..."):
     # Load Resume
-    resume_text, actual_category = load_resume(
+      resume_text, actual_category = load_resume(
         uploaded_file,
         resume_df,
         resume_index
@@ -398,23 +403,30 @@ if analyze:
     # Resume Quality Breakdown
     # --------------------------------------------------
 
-    st.divider()
+        # --------------------------------------------------
+    # Resume Quality Breakdown
+    # --------------------------------------------------
 
     st.subheader("Resume Quality Breakdown")
 
     breakdown_df = pd.DataFrame(
-        breakdown,
-        columns=[
-            "Criterion",
-            "Points"
-        ]
-    )
+    breakdown,
+    columns=["Criterion", "Points"]
+)
+
+    breakdown_df["Status"] = breakdown_df["Points"].apply(
+    lambda x: "Passed" if x > 0 else "Missing"
+)
+
+    breakdown_df = breakdown_df[
+    ["Criterion", "Status", "Points"]
+]
 
     st.dataframe(
-        breakdown_df,
-        use_container_width=True,
-        hide_index=True
-    )
+    breakdown_df,
+    use_container_width=True,
+    hide_index=True
+)
 
     # --------------------------------------------------
     # Recommendation Status
@@ -451,7 +463,7 @@ if analyze:
     # --------------------------------------------------
 
     st.subheader(
-        "Top 5 Job Recommendations"
+        f"Top {min(5, len(results))} Job Recommendations"
     )
 
     chart_data = pd.DataFrame({
@@ -475,89 +487,54 @@ if analyze:
     st.bar_chart(
         chart_data.set_index("Job")
     )
-
     # --------------------------------------------------
     # Recommendation Details
     # --------------------------------------------------
 
-    for i, result in enumerate(
-        results[:5],
-        start=1
-    ):
+    st.subheader(f"Top {min(5, len(results))} Job Recommendations")
 
-        with st.expander(
+    for idx, result in enumerate(results[:5], start=1):
 
-            f"{i}. {result['title']} ({result['score']:.2f}%)"
+        with st.container(border=True):
 
-        ):
+            col1, col2 = st.columns([4, 1])
 
-            st.write(
-                f"Match Score: {result['score']:.2f}%"
-            )
+            with col1:
+                st.markdown(f"### {idx}. {result['title']}")
 
-            st.write("Matching Skills")
+            with col2:
+                st.metric(
+                    "Match",
+                    f"{result['score']:.1f}%"
+                )
+
+            st.progress(result["score"] / 100)
+
+            st.markdown("#### Matching Skills")
 
             if result["matching_skills"]:
 
-                for skill in result[
-                    "matching_skills"
-                ]:
+                cols = st.columns(3)
 
-                    st.write(
-                        f"- {skill}"
-                    )
+                for j, skill in enumerate(result["matching_skills"][:9]):
+                    cols[j % 3].success(skill)
 
             else:
+                st.write("No matching skills found.")
 
-                st.write(
-                    "No matching skills."
-                )
-
-            st.write("Missing Skills")
+            st.markdown("#### Missing Skills")
 
             if result["missing_skills"]:
 
-                for skill in result[
-                    "missing_skills"
-                ][:10]:
+                cols = st.columns(3)
 
-                    st.write(
-                        f"- {skill}"
-                    )
+                for j, skill in enumerate(result["missing_skills"][:9]):
+                    cols[j % 3].warning(skill)
 
             else:
+                st.write("No missing skills.")
 
-                st.write(
-                    "No missing skills."
-                )
-
-    st.divider()
-
-    # --------------------------------------------------
-    # Suggested Skills
-    # --------------------------------------------------
-
-    st.subheader(
-        "Suggested Skills"
-    )
-
-    if best_match["missing_skills"]:
-
-        for skill in best_match[
-            "missing_skills"
-        ][:10]:
-
-            st.write(
-                f"• {skill}"
-            )
-
-    else:
-
-        st.success(
-            "No significant skill gaps detected."
-        )
-
-    st.divider()
+            st.divider()
 
     # --------------------------------------------------
     # Career Path
@@ -607,35 +584,36 @@ if analyze:
         job_match_score
 
     )
+    pdf = create_pdf(report)
 
     st.download_button(
-
-        label="Download Career Report",
-
-        data=report,
-
-        file_name="career_report.txt",
-
-        mime="text/plain"
-
-    )
+    "Download Career Report (PDF)",
+    data=pdf,
+    file_name="career_report.pdf",
+    mime="application/pdf"
+)
 
     st.divider()
+# --------------------------------------------------
+# Resume Preview
+# --------------------------------------------------
 
-    # --------------------------------------------------
-    # Resume Preview
-    # --------------------------------------------------
+    with st.expander("Resume Preview"):
 
-    st.subheader(
-        "Resume Preview"
+        preview = resume_text[:2000]
+
+        st.text_area(
+          "",
+           preview,
+           height=350,
+         disabled=True,
+         label_visibility="collapsed"
     )
 
-    st.text_area(
+        if len(resume_text) > 2000:
+         st.caption("Showing the first 2000 characters.")
 
-        "Resume",
-
-        resume_text[:2000],
-
-        height=300
-
-    )
+st.divider()
+st.caption(
+    "AI Career Advisor | SRH University of Applied Sciences | 2026"
+)
