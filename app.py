@@ -296,6 +296,53 @@ if analyze:
     predicted_category = top_predictions[0]["category"]
     confidence = top_predictions[0]["confidence"]
 
+    # --------------------------------------------------
+    # Confidence Interpretation
+    # --------------------------------------------------
+
+    if confidence >= 70:
+        confidence_level = "High Confidence"
+        confidence_message = (
+            "The model found strong evidence supporting "
+            "the predicted professional category."
+        )
+
+    elif confidence >= 40:
+        confidence_level = "Moderate Confidence"
+        confidence_message = (
+            "The resume contains relevant evidence, but it also "
+            "shares characteristics with other categories."
+        )
+
+    else:
+        confidence_level = "Low Confidence"
+        confidence_message = (
+            "The resume spans several professional areas, so the "
+            "model cannot assign one category with strong certainty."
+        )
+
+# --------------------------------------------------
+# Confidence Notice
+# --------------------------------------------------
+
+        if confidence_level == "High Confidence":
+            st.success(
+                f"**{confidence_level} — {confidence:.2f}%**\n\n"
+                f"{confidence_message}"
+            )
+
+        elif confidence_level == "Moderate Confidence":
+            st.warning(
+                f"**{confidence_level} — {confidence:.2f}%**\n\n"
+                f"{confidence_message}"
+            )
+
+        else:
+            st.error(
+                f"**{confidence_level} — {confidence:.2f}%**\n\n"
+                f"{confidence_message}"
+            )
+
     important_terms = get_prediction_explanation(
         classifier=model,
         tfidf_vectorizer=vectorizer,
@@ -569,24 +616,30 @@ if analyze:
     # --------------------------------------------------
 
     report = generate_report(
-        predicted_category,
-        confidence,
-        {
+        predicted_category=predicted_category,
+        confidence=confidence,
+        confidence_level=confidence_level,
+        confidence_message=confidence_message,
+        top_predictions=top_predictions,
+        important_terms=important_terms,
+        best_match={
             **best_match,
             "recommendation_level": recommendation_level,
         },
-        strength_score,
-        resume_level,
-        job_match_score,
+        strength_score=strength_score,
+        resume_level=resume_level,
+        job_match_score=job_match_score,
     )
 
     pdf = create_pdf(report)
 
     st.download_button(
-        "Download Career Report (PDF)",
+        "Download Official Career Report",
         data=pdf,
-        file_name="career_report.pdf",
+        file_name="ai_career_analysis_report.pdf",
         mime="application/pdf",
+        type="primary",
+        use_container_width=True,
     )
 
     st.divider()
