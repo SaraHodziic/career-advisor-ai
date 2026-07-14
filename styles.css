@@ -1,114 +1,33 @@
-/* Main page */
+/* --------------------------------------------------
+   Theme Variables
+-------------------------------------------------- */
 
-.main {
-    background-color: #f5f7fa;
+:root {
+    color-scheme: light dark;
 }
+
+
+/* --------------------------------------------------
+   Main Layout
+-------------------------------------------------- */
 
 .block-container {
+    max-width: 1400px;
     padding-top: 2rem;
     padding-bottom: 2rem;
-    max-width: 1400px;
 }
 
-/* Titles */
-
-h1 {
-    text-align: center;
-    color: #1f2937;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+label {
+    color: var(--text-color);
 }
 
-h2, h3 {
-    color: #374151;
-}
-
-/* Metric cards */
-
-div[data-testid="metric-container"] {
-    background: white;
-    border: none;
-    border-radius: 16px;
-    padding: 18px;
-    box-shadow:
-        0 2px 6px rgba(0,0,0,0.05),
-        0 8px 24px rgba(0,0,0,0.04);
-}
-
-/* Sidebar */
-
-[data-testid="stSidebar"] {
-    background-color: #ffffff;
-    border-right: 1px solid #e5e7eb;
-}
-
-/* Buttons */
-
-.stButton button {
-    width: 100%;
-    background-color: #2563eb;
-    color: white;
-    border-radius: 12px;
-    border: none;
-    height: 48px;
-    font-weight: 600;
-}
-
-.stButton button:hover {
-    background-color: #1d4ed8;
-}
-
-/* File uploader */
-
-[data-testid="stFileUploader"] {
-    background: white;
-    border-radius: 16px;
-    padding: 15px;
-    box-shadow:
-        0 2px 6px rgba(0,0,0,0.05);
-}
-
-/* Text areas */
-
-textarea {
-    border-radius: 12px !important;
-}
-
-/* Expander cards */
-
-.streamlit-expanderHeader {
-    font-weight: 600;
-}
-
-details {
-    background: white;
-    border-radius: 12px;
-    padding: 8px;
-    margin-bottom: 10px;
-    box-shadow:
-        0 2px 6px rgba(0,0,0,0.04);
-}
-
-/* Dataframe */
-
-[data-testid="stDataFrame"] {
-    background: white;
-    border-radius: 12px;
-}
-
-/* Progress bars */
-
-.stProgress > div > div {
-    border-radius: 999px;
-}
-
-/* Success / warning messages */
-
-.stSuccess,
-.stWarning,
-.stError {
-    border-radius: 12px;
-}
 
 /* --------------------------------------------------
    Hero Section
@@ -128,8 +47,7 @@ details {
             #172033 48%,
             #252f55 100%
         );
-    box-shadow:
-        0 24px 70px rgba(15, 23, 42, 0.22);
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
 }
 
 .hero-content {
@@ -165,12 +83,7 @@ details {
 
 .hero-gradient-text {
     display: block;
-    background: linear-gradient(
-        90deg,
-        #a5b4fc,
-        #c4b5fd,
-        #67e8f9
-    );
+    background: linear-gradient(90deg, #a5b4fc, #c4b5fd, #67e8f9);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -202,8 +115,8 @@ details {
 .hero-meta span::before {
     content: "";
     position: absolute;
-    left: 0;
     top: 50%;
+    left: 0;
     width: 6px;
     height: 6px;
     border-radius: 50%;
@@ -235,7 +148,253 @@ details {
     background: #22d3ee;
 }
 
+
+/* --------------------------------------------------
+   Sidebar
+-------------------------------------------------- */
+
+[data-testid="stSidebar"] {
+    background: var(--secondary-background-color);
+    border-right: 1px solid rgba(128, 128, 128, 0.18);
+}
+
+[data-testid="stSidebarContent"] {
+    padding: 1.15rem 0.85rem 2rem;
+}
+
+[data-testid="stSidebar"] *,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+    color: var(--text-color);
+}
+
+.sidebar-navigation-spacer {
+    min-height: 2rem;
+}
+
+[data-testid="stSidebar"] [role="radiogroup"] {
+    gap: 0.35rem;
+}
+
+[data-testid="stSidebar"] [role="radiogroup"] label {
+    padding: 0.55rem 0.7rem;
+    border-radius: 10px;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+[data-testid="stSidebar"] [role="radiogroup"] label:hover {
+    background: rgba(128, 128, 128, 0.12);
+    transform: translateX(2px);
+}
+
+[data-testid="stSidebar"] input,
+[data-testid="stSidebar"] textarea {
+    color: var(--text-color) !important;
+    background: var(--background-color) !important;
+    border: 1px solid rgba(128, 128, 128, 0.25) !important;
+}
+
+[data-testid="stSidebar"] [data-baseweb="select"] > div {
+    color: var(--text-color);
+    background: var(--background-color);
+    border-color: rgba(128, 128, 128, 0.25);
+}
+
+[data-testid="stSidebar"] [data-testid="stFileUploader"] {
+    color: var(--text-color);
+    background: var(--background-color);
+    border: 1px solid rgba(128, 128, 128, 0.2);
+    box-shadow: none;
+}
+
+
+/* --------------------------------------------------
+   Sidebar Controls
+-------------------------------------------------- */
+
+[data-testid="stSidebarCollapseButton"],
+[data-testid="collapsedControl"] {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+[data-testid="stSidebarCollapseButton"] button,
+[data-testid="collapsedControl"] button {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color) !important;
+    background: var(--secondary-background-color) !important;
+    border: 1px solid rgba(128, 128, 128, 0.22) !important;
+    border-radius: 10px !important;
+}
+
+[data-testid="stSidebarCollapseButton"] svg,
+[data-testid="collapsedControl"] svg {
+    color: var(--text-color) !important;
+    fill: currentColor !important;
+}
+
+[data-testid="stHeader"] {
+    display: flex !important;
+    visibility: visible !important;
+    background: transparent;
+}
+
+
+/* --------------------------------------------------
+   Buttons
+-------------------------------------------------- */
+
+.stButton button,
+.stDownloadButton button {
+    width: 100%;
+    min-height: 48px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.stButton button[kind="primary"] {
+    color: #ffffff;
+    background: #2563eb;
+}
+
+.stButton button[kind="primary"]:hover {
+    background: #1d4ed8;
+}
+
+
+/* --------------------------------------------------
+   Metric Cards
+-------------------------------------------------- */
+
+div[data-testid="metric-container"] {
+    padding: 18px;
+    border: 1px solid rgba(128, 128, 128, 0.15);
+    border-radius: 16px;
+    background: var(--secondary-background-color);
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.05),
+        0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+
+/* --------------------------------------------------
+   Input Components
+-------------------------------------------------- */
+
+[data-testid="stFileUploader"] {
+    padding: 15px;
+    border: 1px solid rgba(128, 128, 128, 0.16);
+    border-radius: 16px;
+    background: var(--secondary-background-color);
+}
+
+textarea {
+    border-radius: 12px !important;
+}
+
+
+/* --------------------------------------------------
+   Expanders and Containers
+-------------------------------------------------- */
+
+details {
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(128, 128, 128, 0.14);
+    border-radius: 12px;
+    background: var(--secondary-background-color);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+[data-testid="stExpander"] summary {
+    font-weight: 600;
+}
+
+
+/* --------------------------------------------------
+   Dataframes and Charts
+-------------------------------------------------- */
+
+[data-testid="stDataFrame"] {
+    overflow: hidden;
+    border: 1px solid rgba(128, 128, 128, 0.14);
+    border-radius: 12px;
+    background: var(--secondary-background-color);
+}
+
+
+/* --------------------------------------------------
+   Progress and Status Messages
+-------------------------------------------------- */
+
+.stProgress > div > div {
+    border-radius: 999px;
+}
+
+.stSuccess,
+.stWarning,
+.stError,
+.stInfo {
+    border-radius: 12px;
+}
+
+
+/* --------------------------------------------------
+   Career Path
+-------------------------------------------------- */
+
+.career-step {
+    min-height: 125px;
+    padding: 1rem;
+    text-align: center;
+    border: 1px solid rgba(128, 128, 128, 0.2);
+    border-radius: 16px;
+    background: var(--secondary-background-color);
+}
+
+.career-step-number {
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    margin-bottom: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.career-step-title {
+    color: var(--text-color);
+    font-size: 0.95rem;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+
+/* --------------------------------------------------
+   Responsive Design
+-------------------------------------------------- */
+
 @media (max-width: 768px) {
+    .block-container {
+        padding-top: 1rem;
+    }
+
     .hero-container {
         padding: 3rem 1.5rem;
         border-radius: 22px;
