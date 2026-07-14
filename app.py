@@ -39,6 +39,52 @@ vectorizer = joblib.load(
     "results/tfidf_vectorizer.pkl"
 )
 
+# --------------------------------------------------
+# Prediction Explanation (XAI)
+# --------------------------------------------------
+
+def get_prediction_explanation(
+    model,
+    vectorizer,
+    resume_vector,
+    predicted_category,
+    top_n=8
+):
+    feature_names = vectorizer.get_feature_names_out()
+
+    class_index = list(model.classes_).index(
+        predicted_category
+    )
+
+    class_coefficients = model.coef_[class_index]
+
+    resume_values = resume_vector.toarray()[0]
+
+    contributions = (
+        resume_values * class_coefficients
+    )
+
+    top_indices = contributions.argsort()[::-1]
+
+    important_terms = []
+
+    for index in top_indices:
+
+        if contributions[index] <= 0:
+            continue
+
+        important_terms.append(
+            {
+                "term": feature_names[index],
+                "contribution": contributions[index]
+            }
+        )
+
+        if len(important_terms) == top_n:
+            break
+
+    return important_terms
+
 
 # --------------------------------------------------
 # Load Datasets
@@ -252,6 +298,14 @@ if analyze:
     predicted_category = top_predictions[0]["category"]
     confidence = top_predictions[0]["confidence"]
 
+    important_terms = get_prediction_explanation(
+        model=model,
+        vectorizer=vectorizer,
+        resume_vector=resume_vector,
+        predicted_category=predicted_category,
+        top_n=8
+    )
+
     # Resume Strength
     strength_score, breakdown, resume_level = (
         calculate_resume_strength(
@@ -350,6 +404,32 @@ if analyze:
             )
 
     col4, col5, col6 = st.columns(3)
+
+    # --------------------------------------------------
+    # Why This Prediction?
+    # --------------------------------------------------
+
+    st.subheader("Why This Prediction?")
+
+    if important_terms:
+
+        explanation_columns = st.columns(4)
+
+        for index, item in enumerate(important_terms):
+            explanation_columns[
+                index % 4
+                ].success(item["term"])
+
+        st.caption(
+            "These resume terms contributed the most "
+            "to the predicted category."
+        )
+
+    else:
+
+        st.info(
+            "No important prediction terms were found."
+        )
 
     with col4:
         st.metric(
