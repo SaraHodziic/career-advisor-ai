@@ -413,12 +413,22 @@ if analyze:
 
     if important_terms:
 
-        explanation_columns = st.columns(4)
+        explanation_df = pd.DataFrame(important_terms)
 
-        for index, item in enumerate(important_terms):
-            explanation_columns[
-                index % 4
-                ].success(item["term"])
+        explanation_df.columns = [
+            "Feature",
+            "Contribution"
+        ]
+
+        st.bar_chart(
+            explanation_df.set_index("Feature")
+        )
+
+        st.dataframe(
+            explanation_df,
+            hide_index=True,
+            use_container_width=True
+        )
 
         st.caption(
             "These resume terms contributed the most "
