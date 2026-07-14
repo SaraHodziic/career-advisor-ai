@@ -14,10 +14,7 @@ def generate_report(
     job_match_score=None,
 ):
     """
-    Build a structured career-analysis report.
-
-    The returned dictionary is passed directly to the PDF
-    generator instead of being converted into plain text.
+    Build the structured career-analysis report consumed by the PDF renderer.
     """
 
     return {
@@ -36,9 +33,7 @@ def generate_report(
         "best_match": {
             "title": best_match["title"],
             "score": best_match["score"],
-            "recommendation_level": best_match[
-                "recommendation_level"
-            ],
+            "recommendation_level": best_match["recommendation_level"],
             "matching_skills": best_match.get(
                 "matching_skills",
                 [],

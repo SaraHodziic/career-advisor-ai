@@ -5,7 +5,6 @@ from reportlab.lib import colors
 from reportlab.lib.enums import (
     TA_CENTER,
     TA_LEFT,
-    TA_RIGHT,
 )
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import (
@@ -13,11 +12,9 @@ from reportlab.lib.styles import (
     getSampleStyleSheet,
 )
 from reportlab.lib.units import cm
-from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import (
     HRFlowable,
-    KeepTogether,
     Paragraph,
     SimpleDocTemplate,
     Spacer,
@@ -34,7 +31,6 @@ NAVY = colors.HexColor("#172033")
 DARK_NAVY = colors.HexColor("#111827")
 INDIGO = colors.HexColor("#6366F1")
 LIGHT_INDIGO = colors.HexColor("#EEF2FF")
-CYAN = colors.HexColor("#22D3EE")
 
 TEXT = colors.HexColor("#1F2937")
 MUTED_TEXT = colors.HexColor("#64748B")

@@ -12,6 +12,17 @@ from src.resume_strength import calculate_resume_strength
 
 
 # --------------------------------------------------
+# Constants
+# --------------------------------------------------
+
+CATEGORY_DISPLAY_NAMES = {
+    "INFORMATION-TECHNOLOGY": "IT",
+    "BUSINESS-DEVELOPMENT": "Business Development",
+    "PUBLIC-RELATIONS": "Public Relations",
+}
+
+
+# --------------------------------------------------
 # Page Configuration
 # --------------------------------------------------
 
@@ -35,6 +46,8 @@ with open("styles.css", encoding="utf-8") as stylesheet:
 
 @st.cache_resource
 def load_models():
+    """Load the trained classifier and TF-IDF vectorizer."""
+
     classifier = joblib.load("results/resume_classifier.pkl")
     tfidf_vectorizer = joblib.load("results/tfidf_vectorizer.pkl")
     return classifier, tfidf_vectorizer
@@ -42,6 +55,8 @@ def load_models():
 
 @st.cache_data
 def load_datasets():
+    """Load resume and job datasets used by the app."""
+
     resumes = pd.read_csv("data/Resume/Resume.csv")
     jobs = pd.read_csv("data/job_dataset.csv")
     return resumes, jobs
@@ -62,6 +77,8 @@ def get_prediction_explanation(
     predicted_category,
     top_n=8,
 ):
+    """Return the highest positive TF-IDF feature contributions."""
+
     feature_names = tfidf_vectorizer.get_feature_names_out()
     class_index = list(classifier.classes_).index(predicted_category)
     class_coefficients = classifier.coef_[class_index]
@@ -86,6 +103,112 @@ def get_prediction_explanation(
             break
 
     return important_terms
+
+
+# --------------------------------------------------
+# Display Helpers
+# --------------------------------------------------
+
+def display_category(category):
+    """Return the user-facing name for a model category."""
+
+    return CATEGORY_DISPLAY_NAMES.get(category, category)
+
+
+def get_confidence_interpretation(confidence):
+    """Map model confidence to a display level and explanation."""
+
+    if confidence >= 70:
+        return (
+            "High Confidence",
+            "The model found strong evidence supporting "
+            "the predicted professional category.",
+        )
+
+    if confidence >= 40:
+        return (
+            "Moderate Confidence",
+            "The resume contains relevant evidence, but it also "
+            "shares characteristics with other categories.",
+        )
+
+    return (
+        "Low Confidence",
+        "The resume spans several professional areas, so the "
+        "model cannot assign one category with strong certainty.",
+    )
+
+
+def render_low_confidence_notice(
+    confidence_level,
+    confidence,
+    confidence_message,
+):
+    """Render the existing low-confidence status notice."""
+
+    message = f"**{confidence_level} — {confidence:.2f}%**\n\n{confidence_message}"
+    st.error(message)
+
+
+def get_recommendation_level(score):
+    """Map a recommendation score to the report-level label."""
+
+    if score >= 70:
+        return "Excellent"
+    if score >= 50:
+        return "Good"
+    if score >= 30:
+        return "Moderate"
+    return "Weak"
+
+
+def get_score_label(score):
+    """Map a recommendation score to the expander caption label."""
+
+    if score >= 70:
+        return "Excellent match"
+    if score >= 50:
+        return "Good match"
+    if score >= 30:
+        return "Moderate match"
+    return "Weak match"
+
+
+def render_resume_text_preview(resume_text):
+    """Render the extracted resume text preview."""
+
+    st.text_area(
+        "",
+        resume_text[:4000],
+        height=400,
+        disabled=True,
+        label_visibility="collapsed",
+    )
+
+    if len(resume_text) > 4000:
+        st.caption("Showing the first 4,000 characters.")
+
+
+def render_resume_preview(uploaded_file, resume_text):
+    """Render either uploaded PDF preview or extracted resume text."""
+
+    if uploaded_file is not None:
+        if uploaded_file.type == "application/pdf":
+            uploaded_file.seek(0)
+            st.pdf(
+                uploaded_file.read(),
+                height=700,
+            )
+        else:
+            render_resume_text_preview(resume_text)
+
+        return
+
+    st.info(
+        "Dataset resumes are stored as extracted text, "
+        "so the original document layout is not available."
+    )
+    render_resume_text_preview(resume_text)
 
 
 # --------------------------------------------------
@@ -144,7 +267,10 @@ analyze = st.sidebar.button(
 )
 
 # Navigation is deliberately rendered last so it appears at the bottom.
-st.sidebar.markdown('<div class="sidebar-navigation-spacer"></div>', unsafe_allow_html=True)
+st.sidebar.markdown(
+    '<div class="sidebar-navigation-spacer"></div>',
+    unsafe_allow_html=True,
+)
 st.sidebar.divider()
 st.sidebar.caption("Navigation")
 
@@ -266,7 +392,7 @@ if page == "About Project":
 
 if analyze:
     with st.spinner("Analyzing Resume..."):
-        resume_text, actual_category = load_resume(
+        resume_text, _actual_category = load_resume(
             uploaded_file,
             resume_df,
             resume_index,
@@ -300,48 +426,16 @@ if analyze:
     # Confidence Interpretation
     # --------------------------------------------------
 
-    if confidence >= 70:
-        confidence_level = "High Confidence"
-        confidence_message = (
-            "The model found strong evidence supporting "
-            "the predicted professional category."
+    confidence_level, confidence_message = get_confidence_interpretation(
+        confidence
+    )
+
+    if confidence_level == "Low Confidence":
+        render_low_confidence_notice(
+            confidence_level,
+            confidence,
+            confidence_message,
         )
-
-    elif confidence >= 40:
-        confidence_level = "Moderate Confidence"
-        confidence_message = (
-            "The resume contains relevant evidence, but it also "
-            "shares characteristics with other categories."
-        )
-
-    else:
-        confidence_level = "Low Confidence"
-        confidence_message = (
-            "The resume spans several professional areas, so the "
-            "model cannot assign one category with strong certainty."
-        )
-
-# --------------------------------------------------
-# Confidence Notice
-# --------------------------------------------------
-
-        if confidence_level == "High Confidence":
-            st.success(
-                f"**{confidence_level} — {confidence:.2f}%**\n\n"
-                f"{confidence_message}"
-            )
-
-        elif confidence_level == "Moderate Confidence":
-            st.warning(
-                f"**{confidence_level} — {confidence:.2f}%**\n\n"
-                f"{confidence_message}"
-            )
-
-        else:
-            st.error(
-                f"**{confidence_level} — {confidence:.2f}%**\n\n"
-                f"{confidence_message}"
-            )
 
     important_terms = get_prediction_explanation(
         classifier=model,
@@ -372,26 +466,8 @@ if analyze:
         st.stop()
 
     best_match = results[0]
-
-    if best_match["score"] >= 70:
-        recommendation_level = "Excellent"
-    elif best_match["score"] >= 50:
-        recommendation_level = "Good"
-    elif best_match["score"] >= 30:
-        recommendation_level = "Moderate"
-    else:
-        recommendation_level = "Weak"
-
-    category_names = {
-        "INFORMATION-TECHNOLOGY": "IT",
-        "BUSINESS-DEVELOPMENT": "Business Development",
-        "PUBLIC-RELATIONS": "Public Relations",
-    }
-
-    display_predicted = category_names.get(
-        predicted_category,
-        predicted_category,
-    )
+    recommendation_level = get_recommendation_level(best_match["score"])
+    display_predicted = display_category(predicted_category)
 
     # --------------------------------------------------
     # Analysis Summary
@@ -413,10 +489,7 @@ if analyze:
     prediction_columns = st.columns(3)
 
     for column, prediction in zip(prediction_columns, top_predictions):
-        display_name = category_names.get(
-            prediction["category"],
-            prediction["category"],
-        )
+        display_name = display_category(prediction["category"])
 
         with column:
             st.metric(
@@ -528,15 +601,7 @@ if analyze:
 
     for index, result in enumerate(results[:5], start=1):
         score = result["score"]
-
-        if score >= 70:
-            score_label = "Excellent match"
-        elif score >= 50:
-            score_label = "Good match"
-        elif score >= 30:
-            score_label = "Moderate match"
-        else:
-            score_label = "Weak match"
+        score_label = get_score_label(score)
 
         with st.expander(
             f"{index}. {result['title']} — {score:.1f}%",
@@ -649,57 +714,8 @@ if analyze:
     # --------------------------------------------------
 
     with st.expander("Resume Preview"):
+        render_resume_preview(uploaded_file, resume_text)
 
-        if uploaded_file is not None:
-
-            file_type = uploaded_file.type
-
-            if file_type == "application/pdf":
-
-                uploaded_file.seek(0)
-
-                pdf_bytes = uploaded_file.read()
-
-                st.pdf(
-                    pdf_bytes,
-                    height=700
-                )
-
-            else:
-
-                st.text_area(
-                    "",
-                    resume_text[:4000],
-                    height=400,
-                    disabled=True,
-                    label_visibility="collapsed"
-                )
-
-                if len(resume_text) > 4000:
-                    st.caption(
-                        "Showing the first 4,000 characters."
-                    )
-
-        else:
-
-            st.info(
-                "Dataset resumes are stored as extracted text, "
-                "so the original document layout is not available."
-            )
-
-            st.text_area(
-                "",
-                resume_text[:4000],
-                height=400,
-                disabled=True,
-                label_visibility="collapsed"
-            )
-
-            if len(resume_text) > 4000:
-                st.caption(
-                    "Showing the first 4,000 characters."
-                )
-                
 # --------------------------------------------------
 # Footer
 # --------------------------------------------------
