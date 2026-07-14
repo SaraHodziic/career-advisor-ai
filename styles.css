@@ -256,12 +256,55 @@ label {
 -------------------------------------------------- */
 
 .stButton button,
-.stDownloadButton button {
+
+/* --------------------------------------------------
+   Download report button
+-------------------------------------------------- */
+
+[data-testid="stDownloadButton"] button {
     width: 100%;
     min-height: 48px;
-    border: none;
-    border-radius: 12px;
-    font-weight: 600;
+    border: 1px solid #4f46e5 !important;
+    border-radius: 12px !important;
+    background: linear-gradient(
+        135deg,
+        #6366f1,
+        #4f46e5
+    ) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    box-shadow:
+        0 8px 22px rgba(79, 70, 229, 0.22);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        filter 0.2s ease;
+}
+
+[data-testid="stDownloadButton"] button:hover {
+    border-color: #4338ca !important;
+    background: linear-gradient(
+        135deg,
+        #4f46e5,
+        #4338ca
+    ) !important;
+    color: #ffffff !important;
+    box-shadow:
+        0 12px 28px rgba(79, 70, 229, 0.3);
+    transform: translateY(-1px);
+}
+
+[data-testid="stDownloadButton"] button:active {
+    transform: translateY(0);
+    box-shadow:
+        0 5px 14px rgba(79, 70, 229, 0.22);
+}
+
+[data-testid="stDownloadButton"] button p,
+[data-testid="stDownloadButton"] button span,
+[data-testid="stDownloadButton"] button svg {
+    color: #ffffff !important;
+    fill: currentColor !important;
 }
 
 .stButton button[kind="primary"] {

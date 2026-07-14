@@ -649,20 +649,57 @@ if analyze:
     # --------------------------------------------------
 
     with st.expander("Resume Preview"):
-        preview = resume_text[:2000]
 
-        st.text_area(
-            "",
-            preview,
-            height=350,
-            disabled=True,
-            label_visibility="collapsed",
-        )
+        if uploaded_file is not None:
 
-        if len(resume_text) > 2000:
-            st.caption("Showing the first 2000 characters.")
+            file_type = uploaded_file.type
 
+            if file_type == "application/pdf":
 
+                uploaded_file.seek(0)
+
+                pdf_bytes = uploaded_file.read()
+
+                st.pdf(
+                    pdf_bytes,
+                    height=700
+                )
+
+            else:
+
+                st.text_area(
+                    "",
+                    resume_text[:4000],
+                    height=400,
+                    disabled=True,
+                    label_visibility="collapsed"
+                )
+
+                if len(resume_text) > 4000:
+                    st.caption(
+                        "Showing the first 4,000 characters."
+                    )
+
+        else:
+
+            st.info(
+                "Dataset resumes are stored as extracted text, "
+                "so the original document layout is not available."
+            )
+
+            st.text_area(
+                "",
+                resume_text[:4000],
+                height=400,
+                disabled=True,
+                label_visibility="collapsed"
+            )
+
+            if len(resume_text) > 4000:
+                st.caption(
+                    "Showing the first 4,000 characters."
+                )
+                
 # --------------------------------------------------
 # Footer
 # --------------------------------------------------
