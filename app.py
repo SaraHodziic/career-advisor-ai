@@ -103,17 +103,36 @@ job_df = pd.read_csv(
 # Header
 # --------------------------------------------------
 
-st.title("AI Career Advisor")
+st.html("""
+<div class="hero-container">
+    <div class="hero-content">
+        <div class="hero-badge">
+            AI-powered resume intelligence
+        </div>
 
-st.write(
-    """
-    Machine Learning based career advisory system
-    for resume classification, job recommendation,
-    skill gap analysis and job description matching.
-    """
-)
+        <h1 class="hero-title">
+            Turn your resume into
+            <span class="hero-gradient-text">
+                career direction.
+            </span>
+        </h1>
 
-st.divider()
+        <p class="hero-description">
+            Classify your professional profile, discover matching roles,
+            uncover missing skills and understand why the model made its prediction.
+        </p>
+
+        <div class="hero-meta">
+            <span>24 career categories</span>
+            <span>2,484 training resumes</span>
+            <span>Explainable AI insights</span>
+        </div>
+    </div>
+
+    <div class="hero-orb hero-orb-one"></div>
+    <div class="hero-orb hero-orb-two"></div>
+</div>
+""")
 
 
 # --------------------------------------------------
