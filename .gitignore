@@ -1,10 +1,27 @@
+# Virtual environments
+.venv/
 venv/
-pycache/
-.pyc
-.DS_Store
+
+# IDE files
+.idea/
+.vscode/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment files
 .env
+.env.*
+
+# Jupyter
 .ipynb_checkpoints/
 
-results/.pkl
-!results/resume_classifier.pkl
-!results/tfidf_vectorizer.pkl
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
