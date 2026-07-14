@@ -233,15 +233,24 @@ if analyze:
         [resume_text]
     )
 
-    predicted_category = model.predict(
+    probabilities = model.predict_proba(
         resume_vector
     )[0]
 
-    confidence = max(
-        model.predict_proba(
-            resume_vector
-        )[0]
-    ) * 100
+    classes = model.classes_
+
+    top_indices = probabilities.argsort()[-3:][::-1]
+
+    top_predictions = [
+        {
+            "category": classes[index],
+            "confidence": probabilities[index] * 100
+        }
+        for index in top_indices
+    ]
+
+    predicted_category = top_predictions[0]["category"]
+    confidence = top_predictions[0]["confidence"]
 
     # Resume Strength
     strength_score, breakdown, resume_level = (
@@ -267,30 +276,22 @@ if analyze:
 
     # Recommendation Level
     if best_match["score"] >= 70:
-
         recommendation_level = "Excellent"
 
     elif best_match["score"] >= 50:
-
         recommendation_level = "Good"
 
     elif best_match["score"] >= 30:
-
         recommendation_level = "Moderate"
 
     else:
-
         recommendation_level = "Weak"
 
     # Short Category Names
     category_names = {
-
         "INFORMATION-TECHNOLOGY": "IT",
-
         "BUSINESS-DEVELOPMENT": "Business Development",
-
         "PUBLIC-RELATIONS": "Public Relations"
-
     }
 
     display_actual = category_names.get(
@@ -312,53 +313,64 @@ if analyze:
     col1, col2, col3 = st.columns(3)
 
     with col1:
-
         st.metric(
-            "Category",
+            "Primary Category",
             display_predicted
         )
 
     with col2:
-
         st.metric(
             "Confidence",
             f"{confidence:.2f}%"
         )
 
     with col3:
-
         st.metric(
             "Resume Quality",
             resume_level
         )
 
+    st.subheader("Top 3 Predicted Categories")
+
+    prediction_columns = st.columns(3)
+
+    for column, prediction in zip(
+            prediction_columns,
+            top_predictions
+    ):
+        display_name = category_names.get(
+            prediction["category"],
+            prediction["category"]
+        )
+
+        with column:
+            st.metric(
+                display_name,
+                f"{prediction['confidence']:.2f}%"
+            )
+
     col4, col5, col6 = st.columns(3)
 
     with col4:
-
         st.metric(
             "Best Match",
             f"{best_match['score']:.2f}%"
         )
 
     with col5:
-
         if job_match_score is not None:
-
             st.metric(
                 "JD Match",
                 f"{job_match_score:.2f}%"
             )
 
         else:
-
             st.metric(
                 "JD Match",
                 "N/A"
             )
 
     with col6:
-
         st.metric(
             "Recommendation",
             recommendation_level
@@ -399,11 +411,8 @@ if analyze:
             st.caption(
                 f"Similarity: {job_match_score:.2f}%"
             )
-                # --------------------------------------------------
-    # Resume Quality Breakdown
-    # --------------------------------------------------
 
-        # --------------------------------------------------
+    # --------------------------------------------------
     # Resume Quality Breakdown
     # --------------------------------------------------
 
